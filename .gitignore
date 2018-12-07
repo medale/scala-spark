@@ -1,2 +1,19 @@
+# IntelliJ
+.idea/
+*.iml
+*.iws
+build/
+
+# Spark artifacts
+spark-warehouse/
+metastore_db/
+derby.log
+
+# General
+*~
 *.class
 *.log
+
+# sbt specific
+target
+.attach_pid*
