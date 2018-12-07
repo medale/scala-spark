@@ -7,9 +7,6 @@ object Dependencies {
   //match Spark's pom for these dependencies!
   val scalaVersionStr = "2.11.8"
   val hadoopVersion = "2.7.3"
-  val parquetVersion = "1.8.3"
-  val avroVersion = "1.7.7"
-  val log4jVersion = "1.2.17"
   //end of Spark version match
 
   val commonDependencies = Seq(

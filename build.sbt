@@ -1,7 +1,5 @@
 import Dependencies._
 
-name := "scala-spark"
-
 //http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html
 //-Xlint enable all recommended warnings
 ThisBuild / javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint", "-encoding", "UTF-8")
@@ -38,12 +36,6 @@ lazy val assemblyPluginSettings = Seq(
   assemblyJarName in assembly := s"${baseDirectory.value.name}-${version.value}-fat.jar",
   //exclude scala from generated fat jars
   assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
-  //put templatized application.conf (see editsource) in root of fat jar
-  assembledMappings in assembly += {
-    sbtassembly.MappingSet(None, Vector(
-      (baseDirectory.value / "target" / "application.conf") -> "application.conf"
-    ))
-  },
   //http://queirozf.com/entries/creating-scala-fat-jars-for-spark-on-sbt-with-sbt-assembly-plugin
   assemblyMergeStrategy in assembly := {
     case PathList("javax", "ws", _@_*) => MergeStrategy.discard
@@ -69,20 +61,21 @@ lazy val miscSettings = Seq(
   organization := "com.uebercomputing"
 )
 
-lazy val combinedSettings = miscSettings ++ assemblyPluginSettings
+lazy val allSettings = miscSettings ++ assemblyPluginSettings
 
 ////////////////////////////////////////////////////////////////////////////
 // Project/module definitions                                             //
 ////////////////////////////////////////////////////////////////////////////
+val namePrefix = "scalaspark"
 
 lazy val common = (project in file("common"))
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
-  .settings(combinedSettings: _*)
+  .settings(allSettings: _*)
   .settings(
+    name := s"${namePrefix}-common",
     libraryDependencies :=
       commonDependencies ++
-      hadoopDependencies ++
       sparkDependencies ++
         testDependencies
   )
@@ -91,8 +84,9 @@ lazy val analytics = (project in file("analytics"))
   .dependsOn(common)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
-  .settings(combinedSettings: _*)
+  .settings(allSettings: _*)
   .settings(
+    name := s"${namePrefix}-analytics",
     libraryDependencies :=
       commonDependencies ++
         sparkDependencies ++
