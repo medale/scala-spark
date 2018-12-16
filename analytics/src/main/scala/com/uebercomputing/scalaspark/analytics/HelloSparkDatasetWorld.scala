@@ -18,6 +18,7 @@ object HelloSparkDatasetWorld {
       Person("Jane","Doe",43))
 
     println(persons(0).isInstanceOf[Product])
+    println(persons(0).isInstanceOf[Serializable])
 
     val people: Dataset[Row] = spark.createDataFrame(persons)
 
