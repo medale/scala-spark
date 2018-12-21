@@ -2,7 +2,7 @@
 header-includes:
  - \usepackage{fvextra}
  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
-
+ - \usepackage{fontspec}
 title: Scala for Apache Spark
 author: Markus Dale, medale@asymmetrik.com
 date: Jan 2019
@@ -20,7 +20,7 @@ date: Jan 2019
 * full interoperability with Java
      * strong type system
      * elegant multi-paradigm (functional & OO)
-     * less keyboard typing
+     * less boilerplate/less code
 * JVM
 
 # Java to Scala - Java Main
@@ -45,21 +45,84 @@ public class JavaMain {
 }
 ```
 
-# Scala Main
+# Scala Main One
 
 \small
 ```scala
 package com.uebercomputing.scalaspark.common
+
+class ScalaMainOne(val answer: Int)
 
 object ScalaMainOne {
 
   def main(args: Array[String]): Unit = {
     println("Starting a Scala program...")
     val scMain = new ScalaMainOne(42)
+    println(scMain)
     val answer = scMain.answer
     println(s"The answer was ${answer}")
   }
 }
-
-class ScalaMainOne(val answer: Int)
 ```
+
+# Scala Main One - Output
+
+\small
+```bash
+Starting a Scala program...
+com.uebercomputing.scalaspark.common.ScalaMainOne@256216b3
+The answer was 42
+```
+
+# Scala Main Two - case class
+
+\small
+```scala
+package com.uebercomputing.scalaspark.common
+
+case class ScalaMainTwo(answer: Int)
+
+object ScalaMainTwo {
+
+  def main(args: Array[String]): Unit = {
+    println("Starting a Scala program...")
+    //ScalaMainTwo.apply(42)
+    val scMain = ScalaMainTwo(42)
+    println(scMain)
+    val answer = scMain.answer
+    println(s"The answer was ${answer}")
+  }
+
+}
+```
+
+# Scala Main Two - Output
+
+\small
+```bash
+Starting a Scala program...
+ScalaMainTwo(42)
+The answer was 42
+```
+
+# Scala Main Two - javap ScalaMainTwo.class
+
+```java
+public class ScalaMainTwo implements Product,Serializable
+  public static Option<Object> unapply(ScalaMainTwo);
+  public static ScalaMainTwo apply(int);
+...
+  public ScalaMainTwo copy(int);
+...
+  public int productArity();
+  public Object productElement(int);
+  public Iterator<Object> productIterator();
+...
+  public int hashCode();
+  public String toString();
+  public boolean equals(Object);
+...
+```
+
+# Scala collections - immutable
+

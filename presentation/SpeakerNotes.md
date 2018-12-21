@@ -19,7 +19,7 @@
 
 # Why Scala for Spark?
 * Data Engineer - scalable ecosystem of Java/Scala-based tools
-* less keyboard typing (Ted Malaska (three big data books on O'Reilly): 50% less than Java)
+* less boilerplate/less typing (Ted Malaska (three big data books on O'Reilly): 50% less than Java)
 * strong typing, elegant multi-paradigm language (functional and OO)
 * all code runs in executor JVM - no callouts to local Python shell for UDFs/UDAFs
 * Baltimore Scala meetup
@@ -30,18 +30,43 @@
 * explicit constructor
 * static main method
 
-# Scala Main
+# Scala Main One
 * Look Ma - no semicolons
+* package structure - match directory structure
+* Match file name/class name
 * object vs. class 
      * object - Java static methods, singleton
 * no public (default)
 * def - method/function declaration
 * type declared after variable name
 * return type, body (last entry gets returned)
+* val - immutable, var - mutable
 * class constructor (args none vs. val vs. var)
      * Java get/set: `import scala.reflect.BeanProperty`
      * `@BeanProperty var firstName`
 
+# Scala Main One - Output
+* println statements
+* default class to String - fully qualified class name@...
+
+# Scala Main Two - case class
+* immutable data structure
+* default constructor parameters are `val`
+* generates boiler plate code, singleton object
+
+# Scala Main Two - javap ScalaMainTwo.class
+* javap disassembler (package names removed)
+* implements Product (abstract algebraic type), Serializable
+     * Serializable important for Spark shuffle!
+     * Product
+          * productArity
+          * productElement(int) 
+          * productIterator
+* static apply factory method/unapply for matching
+* copy method
+* equals, hashCode, toString (see javap output next)
+
+# Scala collections
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin
 * object/main method
