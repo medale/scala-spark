@@ -1,10 +1,16 @@
 package com.uebercomputing.scalaspark.analytics
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
+import scala.collection.JavaConverters._
+
 /**
   * ~"static" class (object), main method,
+  * expression-oriented (if construct returns value)
   * strings/triple quotes,
   * method definitions/return last line/Unit ~ void
   * SparkSession,SparkContext,RDD (like a distributed Scala collection)
@@ -20,48 +26,53 @@ object HelloSparkWorld {
 
   val StopWords = List("be","the")
 
-  def mkLines(input: String): Array[String] = {
+  def readLinesFromString(input: String): Seq[String] = {
     val lines = MarkTwainQuote.split("\n")
     lines
   }
 
-  def process(spark: SparkSession): Unit = {
-    val lines = mkLines(MarkTwainQuote)
+  def readLinesFromFile(inputFile: String): Seq[String] = {
+    val inputPath = Paths.get(inputFile)
+    val linesJava: java.util.List[String] = Files.readAllLines(inputPath)
+    val lines = linesJava.asScala //mutable.Buffer
+    lines
+  }
+
+  def process(spark: SparkSession, lines: Seq[String]): Unit = {
     val sc = spark.sparkContext
 
     //val linesRdd = sc.parallelize(seq = lines, numSlices = 2)
     val mixedCaseLinesRdd: RDD[String] = sc.parallelize(seq = lines, numSlices = 2)
     val lowerCaseLinesRdd = mixedCaseLinesRdd.map(line => line.toLowerCase)
-
-    println(s"We had ${lowerCaseLinesRdd.count} lines in our RDD")
-
     val wordsRdd = lowerCaseLinesRdd.flatMap(line => line.split("""\s+"""))
-
-    println(s"We had ${wordsRdd.count} total words in our lines")
-
     val noStopWordsRdd = wordsRdd.filter(word => !StopWords.contains(word))
-
-    println(s"We had ${noStopWordsRdd.count} words that weren't stop words in our lines")
-
     val localWords = noStopWordsRdd.collect()
 
     println(s"The words were: ${localWords.mkString("\n","\n","\n")}")
-
   }
 
   /**
     * Need to add "provided" scope back to runtime:
-    * Run - Edit configurations - HelloSparkWorld - use classpath of module - check box
+    * Run - Edit configurations - HelloSparkWorld -
+    * use classpath of module - check box
     *
     * @param args
     */
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().
+
+    val lines = if (!args.isEmpty) {
+      val inputFile = args(0)
+      readLinesFromFile(inputFile)
+    } else {
+      readLinesFromString(MarkTwainQuote)
+    }
+
+    val spark = SparkSession.builder.
       appName("HelloSparkWorld").
       master("local[2]").
       getOrCreate()
 
-    process(spark)
+    process(spark, lines)
 
     spark.close()
   }

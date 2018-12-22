@@ -2,6 +2,10 @@
 % Markus Dale, medale@asymmetrik.com
 % Jan 2019
 
+# Setup
+* Open Spark API: https://spark.apache.org/docs/latest/api/scala/index.html
+* Open Scala API: https://www.scala-lang.org/api/2.11.8/#package
+
 # Intro, Slides And Code
 * Bio:
      * mostly Java, big data with Hadoop
@@ -66,7 +70,28 @@
 * copy method
 * equals, hashCode, toString (see javap output next)
 
-# Scala collections
+# HelloSparkWorld - expression-oriented 
+* expressions returns value (vs. statements)
+     * Array (any indexed sequence) accessor args(index)
+     * type of lines is inferred as lowest-common denominator if/else block
+
+# Scala Type Hierarchy
+
+
+# HelloSparkWorld - SparkSession
+* object - main method entry point
+* [SparkSession Scala API](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession)
+     * scaladocs
+     * object
+     * class
+     * .builder method (don't need empty parentheses - mutator method with ())
+* Builder class - fluent interface/method chaining
+     * getOrCreate
+     * Run from shell or batch spark-submit
+
+# SparkSession Scala API
+* Showed SparkSession scaladocs
+
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin
 * object/main method

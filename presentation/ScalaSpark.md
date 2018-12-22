@@ -123,6 +123,46 @@ public class ScalaMainTwo implements Product,Serializable
   public boolean equals(Object);
 ...
 ```
+# HelloSparkWorld - expression-oriented
 
-# Scala collections - immutable
+```scala
+object HelloSparkWorld {
+...
+  def main(args: Array[String]): Unit = {
+
+    val lines = if (!args.isEmpty) {
+      val inputFile = args(0)
+      readLinesFromFile(inputFile)
+    } else {
+      readLinesFromString(MarkTwainQuote)
+    }
+    ...
+}
+```
+
+# Scala Type Hierarchy
+
+![Scala Type Hierarchy](graphics/ScalaTypeHierarchy.png)
+
+
+# HelloSparkWorld - SparkSession
+
+```scala
+import org.apache.spark.sql.SparkSession
+...
+val spark = SparkSession.builder.
+   appName("HelloSparkWorld").
+   master("local[2]").
+   getOrCreate()
+
+   process(spark)
+
+   spark.close()
+```
+
+# SparkSession Scala API
+
+![SparkSession class](graphics/SparkSessionApi.png)
+
+
 
