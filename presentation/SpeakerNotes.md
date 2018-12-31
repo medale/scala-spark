@@ -5,6 +5,7 @@
 # Setup
 * Open Spark API: https://spark.apache.org/docs/latest/api/scala/index.html
 * Open Scala API: https://www.scala-lang.org/api/2.11.8/#package
+* Open Java API String: https://docs.oracle.com/javase/8/docs/api/
 
 # Intro, Slides And Code
 * Bio:
@@ -26,6 +27,7 @@
 * less boilerplate/less typing (Ted Malaska (three big data books on O'Reilly): 50% less than Java)
 * strong typing, elegant multi-paradigm language (functional and OO)
 * all code runs in executor JVM - no callouts to local Python shell for UDFs/UDAFs
+* spark-shell is Scala-based
 * Baltimore Scala meetup
 
 # Java to Scala - Java Main
@@ -57,6 +59,10 @@
 * immutable data structure
 * default constructor parameters are `val`
 * generates boiler plate code, singleton object
+* Scala: Lots of "syntactic sugar" - less typing, compiler translates
+
+# Scala Main One - Output
+* toString method created, prints class name, instance variables
 
 # Scala Main Two - javap ScalaMainTwo.class
 * javap disassembler (package names removed)
@@ -76,7 +82,16 @@
      * type of lines is inferred as lowest-common denominator if/else block
 
 # Scala Type Hierarchy
-
+* Main division - AnyVal vs. AnyRef (unified through Any)
+* AnyRef is like Object in Java
+     * Null is a subclass of all reference classes
+* AnyVal - Java primitives
+     * Unit - `val u = () //u: Unit = () 0-tuple`
+     * Value class: `class Wrapper(val underlying: Int) extends AnyVal`
+* Universal trait: 
+     * trait that extends Any
+     * only has defs as members
+* Nothing is subclass of everything (throwing exception returns Nothing)
 
 # HelloSparkWorld - SparkSession
 * object - main method entry point
@@ -91,6 +106,23 @@
 
 # SparkSession Scala API
 * Showed SparkSession scaladocs
+
+# HelloSparkWorld - String, StringOps, implicits
+* Triple quoted string can include special chars like newline, double-quote
+* .stripMargin - by default uses pipe | removes all chars in front of pipe
+* String - where does stripMargin method come from?
+
+# Java API - String
+* java.lang.String - does not have stripMargin method
+
+# Scala Predef API - implicit conversions
+* `implicit def augmentString(x: String): StringOps`
+* Also: `implicit def booleanArrayOps(xs: Array[Boolean]): ArrayOps[Boolean]`
+
+# Scala StringOps API - stripMargin
+* stripMargin method
+* Also useful: head, tail, map, filter, sliding (ngrams), permutations
+
 
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin

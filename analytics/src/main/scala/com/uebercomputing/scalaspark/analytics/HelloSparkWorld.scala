@@ -9,6 +9,9 @@ import org.apache.spark.sql.SparkSession
 import scala.collection.JavaConverters._
 
 /**
+  * Must add Provided scope to run: Run - Edit Configurations... - HelloSparkWorld
+  * use classpath of module - click Include Dependencies with Provided scope
+  *
   * ~"static" class (object), main method,
   * expression-oriented (if construct returns value)
   * strings/triple quotes,
@@ -18,16 +21,14 @@ import scala.collection.JavaConverters._
   */
 object HelloSparkWorld {
 
-  val MarkTwainQuote =
-    """Twenty years from now
-      |you will be more disappointed
-      |by the things that you didn't do
-      |than by the ones you did do""".stripMargin
+  val GhandiQuote =
+    """Live as if you were to die tomorrow
+      |Learn as if you were to live forever""".stripMargin
 
-  val StopWords = List("be","the")
+  val StopWords = List("be","to")
 
   def readLinesFromString(input: String): Seq[String] = {
-    val lines = MarkTwainQuote.split("\n")
+    val lines = input.split("\n")
     lines
   }
 
@@ -38,17 +39,28 @@ object HelloSparkWorld {
     lines
   }
 
+  def add(a: Int, b: Int): Int = a + b
+
   def process(spark: SparkSession, lines: Seq[String]): Unit = {
     val sc = spark.sparkContext
 
-    //val linesRdd = sc.parallelize(seq = lines, numSlices = 2)
     val mixedCaseLinesRdd: RDD[String] = sc.parallelize(seq = lines, numSlices = 2)
     val lowerCaseLinesRdd = mixedCaseLinesRdd.map(line => line.toLowerCase)
     val wordsRdd = lowerCaseLinesRdd.flatMap(line => line.split("""\s+"""))
     val noStopWordsRdd = wordsRdd.filter(word => !StopWords.contains(word))
-    val localWords = noStopWordsRdd.collect()
 
-    println(s"The words were: ${localWords.mkString("\n","\n","\n")}")
+    val wordCountTuplesRdd = noStopWordsRdd.map { w => (w, 1) }
+
+    // 1. explicitly declared def add(a: Int, b: Int): Int = a + b
+    //    wordCountTuplesRdd.reduceByKey(add)
+    // 2. explicit anonymous function
+    //    wordCountTuplesRdd.reduceByKey((a: Int, b: Int) => a + b)
+    // 3. anonymous function with syntactic sugar
+    val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
+
+    val localWordCounts = wordCountsRdd.collect()
+
+    println(s"The word counts were: ${localWordCounts.mkString("\n","\n","\n")}")
   }
 
   /**
@@ -64,7 +76,7 @@ object HelloSparkWorld {
       val inputFile = args(0)
       readLinesFromFile(inputFile)
     } else {
-      readLinesFromString(MarkTwainQuote)
+      readLinesFromString(GhandiQuote)
     }
 
     val spark = SparkSession.builder.

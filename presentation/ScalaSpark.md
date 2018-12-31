@@ -164,5 +164,34 @@ val spark = SparkSession.builder.
 
 ![SparkSession class](graphics/SparkSessionApi.png)
 
+# HelloSparkWorld - String, StringOps, implicits
+
+```scala
+val GhandiQuote =
+    """Live as if you were to die tomorrow
+      |Learn as if you were to live forever""".stripMargin
+      
+def readLinesFromString(input: String): Seq[String] = {
+  val lines = input.split("\n")
+  lines
+}
+...
+readLinesFromString(GhandiQuote)
+```
+
+
+# Java API - String
+
+![Java String API](graphics/JavaStringApi.png)
+
+
+# Scala Predef API - implicit conversions
+
+![Scala Predef API](graphics/ScalaPredefApi.png)
+
+
+# Scala StringOps API - stripMargin
+
+![Scala StringOps API](graphics/ScalaStringOpsApi.png)
 
 
