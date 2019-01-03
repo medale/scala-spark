@@ -45,6 +45,7 @@
 * no public (default)
 * def - method/function declaration
 * type declared after variable name
+* parameterized type: `Array[String]`
 * return type, body (last entry gets returned)
 * val - immutable, var - mutable
 * class constructor (args none vs. val vs. var)
@@ -59,6 +60,8 @@
 * immutable data structure
 * default constructor parameters are `val`
 * generates boiler plate code, singleton object
+     * apply method - constructor without new
+     * also unapply for pattern matching
 * Scala: Lots of "syntactic sugar" - less typing, compiler translates
 
 # Scala Main One - Output
@@ -73,6 +76,7 @@
           * productElement(int) 
           * productIterator
 * static apply factory method/unapply for matching
+   * two fields etc.: `public static Option<Tuple2<Object, Object>> unapply(Foo)`
 * copy method
 * equals, hashCode, toString (see javap output next)
 
@@ -80,6 +84,7 @@
 * expressions returns value (vs. statements)
      * Array (any indexed sequence) accessor args(index)
      * type of lines is inferred as lowest-common denominator if/else block
+     * In this case: `Seq[String]`
 
 # Scala Type Hierarchy
 * Main division - AnyVal vs. AnyRef (unified through Any)
@@ -110,7 +115,7 @@
 # HelloSparkWorld - String, StringOps, implicits
 * Triple quoted string can include special chars like newline, double-quote
 * .stripMargin - by default uses pipe | removes all chars in front of pipe
-* String - where does stripMargin method come from?
+* String - where does stripMargin method come from? (next slide)
 
 # Java API - String
 * java.lang.String - does not have stripMargin method
@@ -123,6 +128,25 @@
 * stripMargin method
 * Also useful: head, tail, map, filter, sliding (ngrams), permutations
 
+# HelloSparkWorld - accessing Java API/libraries
+* import aliasing: `import java.util.{List => JavaList}`
+* `readLinesFromFile` uses nio.Paths/Files (could use any 3rd party Java library, e.g. Apache Commons IO)
+* `import scala.collection.JavaConverters._` - implicit conversions
+     * underscore like Java * - import all methods from JavaConverters
+     * DecorateAsScala/DecorateAsJava/AsScala/AsScala
+* last line `lines` gets returned from method (return type Seq\[String\])
+
+# HelloSparkWorld - map, flatMap, filter
+* Scala 1 JVM processing - Seq trait (Array implements)
+* higher-order functions - input is a function (or returns function)
+* map - iterate over seq, one input, one output element
+* flatMap - one input element - GenTraversableOnce (Seq-like), 0 or more
+* filter - keep elements that test true
+* groupBy - create map with word, list of all occurrences of word (could group by same starting letter...)
+* `case (key, values)` - partial function, pattern match
+
+# Scala Seq trait API
+* Show filter, flatMap higher-order functions
 
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin

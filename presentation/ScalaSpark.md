@@ -134,7 +134,7 @@ object HelloSparkWorld {
       val inputFile = args(0)
       readLinesFromFile(inputFile)
     } else {
-      readLinesFromString(MarkTwainQuote)
+      readLinesFromString(GhandiQuote)
     }
     ...
 }
@@ -155,9 +155,11 @@ val spark = SparkSession.builder.
    master("local[2]").
    getOrCreate()
 
-   process(spark)
+val lines = ... 
 
-   spark.close()
+wordCountRdd(spark, lines)
+
+spark.close()
 ```
 
 # SparkSession Scala API
@@ -179,7 +181,6 @@ def readLinesFromString(input: String): Seq[String] = {
 readLinesFromString(GhandiQuote)
 ```
 
-
 # Java API - String
 
 ![Java String API](graphics/JavaStringApi.png)
@@ -193,5 +194,41 @@ readLinesFromString(GhandiQuote)
 # Scala StringOps API - stripMargin
 
 ![Scala StringOps API](graphics/ScalaStringOpsApi.png)
+
+
+# HelloSparkWorld - accessing Java API/libraries
+
+```scala
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.{List => JavaList}
+
+import scala.collection.JavaConverters._
+
+def readLinesFromFile(inputFile: String): Seq[String] = {
+  val inputPath = Paths.get(inputFile)
+  val linesJava: JavaList[String] = 
+     Files.readAllLines(inputPath)
+  val lines = linesJava.asScala //mutable.Buffer
+  lines
+}
+```
+
+# HelloSparkWorld - map, flatMap, filter
+
+```scala
+val lowerCaseLines = lines.map { line => line.toLowerCase }
+val words = lowerCaseLines.flatMap { line => line.split("""\s+""")}
+val noStopWords = words.filter(word => !StopWords.contains(word))
+val wordsMap: Map[String,Seq[String]] = noStopWords.groupBy( w => identity(w))
+val wordCountsMap = wordsMap.map { case (key, values) => (key, values.size)}
+println(s"The word counts were: ${wordCountsMap.mkString("\n","\n","\n")}")
+```
+
+# Scala Seq trait API
+
+![Scala Seq](graphics/ScalaSeqApi.png)
+
+# HelloSparkWorld - RDDs
 
 

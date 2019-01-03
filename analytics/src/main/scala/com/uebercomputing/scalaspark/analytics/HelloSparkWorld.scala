@@ -2,6 +2,7 @@ package com.uebercomputing.scalaspark.analytics
 
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.{List => JavaList}
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -34,14 +35,27 @@ object HelloSparkWorld {
 
   def readLinesFromFile(inputFile: String): Seq[String] = {
     val inputPath = Paths.get(inputFile)
-    val linesJava: java.util.List[String] = Files.readAllLines(inputPath)
+    val linesJava: JavaList[String] = Files.readAllLines(inputPath)
     val lines = linesJava.asScala //mutable.Buffer
     lines
   }
 
   def add(a: Int, b: Int): Int = a + b
 
-  def process(spark: SparkSession, lines: Seq[String]): Unit = {
+  def wordCountLocal(lines: Seq[String]): Unit = {
+    val lowerLines = lines.map { line => line.toLowerCase }
+    val words = lowerLines.flatMap { line => line.split("""\s+""")}
+    val noStopWords = words.filter(word => !StopWords.contains(word))
+    val wordsMap: Map[String,Seq[String]] =
+      noStopWords.groupBy( w => identity(w))
+    val wordCountsMap = wordsMap.map { case (key, values) =>
+      (key, values.size)}
+    println(s"The word counts were: ${wordCountsMap.mkString("\n","\n","\n")}")
+  }
+
+  def wordCountRdd(spark: SparkSession, lines: Seq[String]): Unit = {
+    //for real processing -
+    //val mixedCaseLinesRdd = spark.read.textFile(inputPath).rdd
     val sc = spark.sparkContext
 
     val mixedCaseLinesRdd: RDD[String] = sc.parallelize(seq = lines, numSlices = 2)
@@ -79,12 +93,14 @@ object HelloSparkWorld {
       readLinesFromString(GhandiQuote)
     }
 
+    wordCountLocal(lines)
+
     val spark = SparkSession.builder.
       appName("HelloSparkWorld").
       master("local[2]").
       getOrCreate()
 
-    process(spark, lines)
+    wordCountRdd(spark, lines)
 
     spark.close()
   }
