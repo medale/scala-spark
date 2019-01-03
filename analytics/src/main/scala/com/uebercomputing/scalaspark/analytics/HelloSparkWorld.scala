@@ -40,36 +40,40 @@ object HelloSparkWorld {
     lines
   }
 
-  def add(a: Int, b: Int): Int = a + b
-
   def wordCountLocal(lines: Seq[String]): Unit = {
-    val lowerLines = lines.map { line => line.toLowerCase }
-    val words = lowerLines.flatMap { line => line.split("""\s+""")}
-    val noStopWords = words.filter(word => !StopWords.contains(word))
+
+    def toLower(s: String): String = {
+      s.toLowerCase
+    }
+    //explicitly call function
+    val lowerLines = lines.map(toLower)
+
+    val words = lowerLines.flatMap { line =>
+      line.split("""\s+""")}
+
+    val noStopWords = words.filter(!StopWords.contains(_))
+
     val wordsMap: Map[String,Seq[String]] =
       noStopWords.groupBy( w => identity(w))
-    val wordCountsMap = wordsMap.map { case (key, values) =>
-      (key, values.size)}
-    println(s"The word counts were: ${wordCountsMap.mkString("\n","\n","\n")}")
+    //wordsMap.mapValues(vs => vs.size)
+    val wordCountsMap = wordsMap.mapValues(_.size)
+    val countsString = wordCountsMap.mkString("\n","\n","\n")
+    println(s"The word counts were: ${countsString}")
   }
 
   def wordCountRdd(spark: SparkSession, lines: Seq[String]): Unit = {
     //for real processing -
-    //val mixedCaseLinesRdd = spark.read.textFile(inputPath).rdd
+    //val mixedLinesRdd = spark.read.textFile(inputPath).rdd
     val sc = spark.sparkContext
 
-    val mixedCaseLinesRdd: RDD[String] = sc.parallelize(seq = lines, numSlices = 2)
-    val lowerCaseLinesRdd = mixedCaseLinesRdd.map(line => line.toLowerCase)
-    val wordsRdd = lowerCaseLinesRdd.flatMap(line => line.split("""\s+"""))
-    val noStopWordsRdd = wordsRdd.filter(word => !StopWords.contains(word))
+    val mixedLinesRdd: RDD[String] = sc.parallelize(seq = lines, numSlices = 2)
+    val lowerLinesRdd = mixedLinesRdd.map(_.toLowerCase)
+    val wordsRdd = lowerLinesRdd.flatMap(_.split("""\s+"""))
+    val noStopWordsRdd = wordsRdd.filter(!StopWords.contains(_))
 
-    val wordCountTuplesRdd = noStopWordsRdd.map { w => (w, 1) }
+    //Don't use groupBy - very expensive to shuffle words across partition!
 
-    // 1. explicitly declared def add(a: Int, b: Int): Int = a + b
-    //    wordCountTuplesRdd.reduceByKey(add)
-    // 2. explicit anonymous function
-    //    wordCountTuplesRdd.reduceByKey((a: Int, b: Int) => a + b)
-    // 3. anonymous function with syntactic sugar
+    val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
     val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
 
     val localWordCounts = wordCountsRdd.collect()

@@ -3,6 +3,7 @@ header-includes:
  - \usepackage{fvextra}
  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
  - \usepackage{fontspec}
+ - \usepackage{setspace}
 title: Scala for Apache Spark
 author: Markus Dale, medale@asymmetrik.com
 date: Jan 2019
@@ -64,10 +65,10 @@ object ScalaMainOne {
   }
 }
 ```
+\normalsize
 
 # Scala Main One - Output
 
-\small
 ```bash
 Starting a Scala program...
 com.uebercomputing.scalaspark.common.ScalaMainOne@256216b3
@@ -95,10 +96,11 @@ object ScalaMainTwo {
 
 }
 ```
+\normalsize
+
 
 # Scala Main Two - Output
 
-\small
 ```bash
 Starting a Scala program...
 ScalaMainTwo(42)
@@ -107,6 +109,7 @@ The answer was 42
 
 # Scala Main Two - javap ScalaMainTwo.class
 
+\small
 ```java
 public class ScalaMainTwo implements Product,Serializable
   public static Option<Object> unapply(ScalaMainTwo);
@@ -123,6 +126,8 @@ public class ScalaMainTwo implements Product,Serializable
   public boolean equals(Object);
 ...
 ```
+\normalsize
+
 # HelloSparkWorld - expression-oriented
 
 ```scala
@@ -198,6 +203,7 @@ readLinesFromString(GhandiQuote)
 
 # HelloSparkWorld - accessing Java API/libraries
 
+\small
 ```scala
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -213,22 +219,82 @@ def readLinesFromFile(inputFile: String): Seq[String] = {
   lines
 }
 ```
+\normalsize
 
-# HelloSparkWorld - map, flatMap, filter
+# wordCountLocal: map higher-order function w/named function
 
 ```scala
-val lowerCaseLines = lines.map { line => line.toLowerCase }
-val words = lowerCaseLines.flatMap { line => line.split("""\s+""")}
-val noStopWords = words.filter(word => !StopWords.contains(word))
-val wordsMap: Map[String,Seq[String]] = noStopWords.groupBy( w => identity(w))
-val wordCountsMap = wordsMap.map { case (key, values) => (key, values.size)}
-println(s"The word counts were: ${wordCountsMap.mkString("\n","\n","\n")}")
+def toLower(s: String): String = {
+   s.toLowerCase
+}
+
+val lowerLines = lines.map(toLower)
+```
+
+# wordCountLocal: map higher-order function w/ function literal
+
+```scala
+//function literal - anonymous function with explicit type: 
+lines.map((l: String) => l.toLowerCase)
+
+//function literal - anonymous with inferred type:
+lines.map(l => l.toLowerCase)
+
+//function literal with placeholder syntax
+lines.map(_.toLowerCase)
+```
+
+# wordCountLocal: flatMap and filter
+```scala
+
+val words = lowerLines.flatMap { line => 
+   line.split("""\s+""")
+}
+
+val noStopWords = words.filter(!StopWords.contains(_))
 ```
 
 # Scala Seq trait API
 
 ![Scala Seq](graphics/ScalaSeqApi.png)
 
-# HelloSparkWorld - RDDs
+# wordCountLocal: groupBy, mkString
 
+```scala
+val wordsMap: Map[String,Seq[String]] =
+   noStopWords.groupBy( w => identity(w))
 
+val wordCountsMap = wordsMap.mapValues(_.size)
+
+val countsString = wordCountsMap.mkString("\n","\n","\n")
+println(s"The word counts were: ${countsString}")
+```
+
+# HelloSparkWorld - RDD map, flatMap, filter
+
+\small
+```scala
+//val mixedLinesRdd = spark.read.textFile(inputPath).rdd
+val sc = spark.sparkContext
+
+val mixedLinesRdd: RDD[String] = 
+   sc.parallelize(seq = lines, numSlices = 2)
+   
+val lowerLinesRdd = mixedLinesRdd.map(_.toLowerCase)
+
+val wordsRdd = lowerLinesRdd.flatMap(_.split("""\s+"""))
+
+val noStopWordsRdd = wordsRdd.filter(!StopWords.contains(_))
+```
+\normalsize
+
+# HelloSparkWorld - RDD of tuples - PairRDDFunctions
+
+```scala
+ //Don't use groupBy - very expensive to shuffle words across partition!
+val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
+val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
+
+//and Action!
+val localWordCounts = wordCountsRdd.collect()
+```

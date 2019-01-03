@@ -136,17 +136,47 @@
      * DecorateAsScala/DecorateAsJava/AsScala/AsScala
 * last line `lines` gets returned from method (return type Seq\[String\])
 
-# HelloSparkWorld - map, flatMap, filter
+# wordCountLocal: map higher-order function w/named function
 * Scala 1 JVM processing - Seq trait (Array implements)
 * higher-order functions - input is a function (or returns function)
 * map - iterate over seq, one input, one output element
+     * Immutability: underlying seq is not updated, returns new seq!
+* map - with named function 
+   * if small function - pollute namespace, harder to read
+   
+# wordCountLocal: map higher-order function w/ function literal
+* syntactic sugar 1 - type is inferred
+* placeholder syntax - if parameter is only used once
+     * for two param function, first _, second _
+ 
+ # wordCountLocal: flatMap and filter
 * flatMap - one input element - GenTraversableOnce (Seq-like), 0 or more
 * filter - keep elements that test true
-* groupBy - create map with word, list of all occurrences of word (could group by same starting letter...)
-* `case (key, values)` - partial function, pattern match
 
 # Scala Seq trait API
 * Show filter, flatMap higher-order functions
+
+# wordCountLocal: groupBy, mkString
+* groupBy - create map with word, list of all occurrences of word (could group by same starting letter...)
+* mapValues(syntactic sugar - _ argument one)
+* mkString
+* string interpolation - s"..."
+
+# HelloSparkWorld - RDD map, flatMap, filter
+* process at scale!
+* parallelize from driver to executor
+* Immutable RDD - map, flatMap, filter transformations!
+     * action like collect, take, write causes execution
+
+# HelloSparkWorld - RDD of tuples - PairRDDFunctions
+* groupBy - expensive shuffle operation
+* map to 2 tuple - implicit conversion to PairRDDFunctions
+     * object RDD - `implicit def rddToPairRDDFunctions(rdd: RDD[(K, V)])`
+* PairRDDFunctions - reduceByKey - function with two arguments
+     * local combine step, then shuffle (hashPartitioner)
+* transformations (lazy) executed by action collect()!
+     * to local driver - memory!!!
+
 
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin
