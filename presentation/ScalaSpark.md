@@ -152,20 +152,26 @@ object HelloSparkWorld {
 
 # HelloSparkWorld - SparkSession
 
+\small
 ```scala
 import org.apache.spark.sql.SparkSession
 ...
-val spark = SparkSession.builder.
-   appName("HelloSparkWorld").
-   master("local[2]").
-   getOrCreate()
+def main(args: Array[String]): Unit = {
+   val lines = ...
 
-val lines = ... 
+   wordCountLocal(lines)
 
-wordCountRdd(spark, lines)
+   val spark = SparkSession.builder.
+      appName("HelloSparkWorld").
+      master("local[2]").
+      getOrCreate()
 
-spark.close()
+   wordCountRdd(spark, lines)
+
+   spark.close()
+}
 ```
+\normalsize
 
 # SparkSession Scala API
 
@@ -224,17 +230,20 @@ def readLinesFromFile(inputFile: String): Seq[String] = {
 # wordCountLocal: map higher-order function w/named function
 
 ```scala
-def toLower(s: String): String = {
-   s.toLowerCase
-}
+def wordCountLocal(lines: Seq[String]): Unit = {
 
-val lowerLines = lines.map(toLower)
+  def toLower(s: String): String = {
+    s.toLowerCase
+  }
+
+  val lowerLines = lines.map(toLower)
+  ...
 ```
 
 # wordCountLocal: map higher-order function w/ function literal
 
 ```scala
-//function literal - anonymous function with explicit type: 
+//function literal - anonymous function explicit type: 
 lines.map((l: String) => l.toLowerCase)
 
 //function literal - anonymous with inferred type:
@@ -244,7 +253,15 @@ lines.map(l => l.toLowerCase)
 lines.map(_.toLowerCase)
 ```
 
-# wordCountLocal: flatMap and filter
+# map function
+
+![Map](graphics/map.png)
+
+# flatMap 
+
+![flatMap](graphics/flatMap.png)
+
+# wordCountLocal: flatMap, filter
 ```scala
 
 val words = lowerLines.flatMap { line => 
@@ -258,17 +275,29 @@ val noStopWords = words.filter(!StopWords.contains(_))
 
 ![Scala Seq](graphics/ScalaSeqApi.png)
 
-# wordCountLocal: groupBy, mkString
+# wordCountLocal: foldLeft
 
 ```scala
-val wordsMap: Map[String,Seq[String]] =
-   noStopWords.groupBy( w => identity(w))
+val emptyMapWithZeroDefault =
+  Map[String, Int]().withDefaultValue(0)
 
-val wordCountsMap = wordsMap.mapValues(_.size)
+//foldLeft(z: B)((B,A) => B): B
+val wordCountsMap: Map[String, Int] =
+  noStopWords.foldLeft(emptyMapWithZeroDefault)(
+    (wcMap, word) => {
+      val newCount = wcMap(word) + 1
+      wcMap + (word -> newCount)
+    })
+```
 
-val countsString = wordCountsMap.mkString("\n","\n","\n")
+# wordCountLocal: mkString
+
+\small
+```scala
+val countsString = wordCountsMap.mkString("\n", "\n", "\n")
 println(s"The word counts were: ${countsString}")
 ```
+\normalsize
 
 # HelloSparkWorld - RDD map, flatMap, filter
 
@@ -291,7 +320,7 @@ val noStopWordsRdd = wordsRdd.filter(!StopWords.contains(_))
 # HelloSparkWorld - RDD of tuples - PairRDDFunctions
 
 ```scala
- //Don't use groupBy - very expensive to shuffle words across partition!
+ //Don't use groupBy - expensive to shuffle words across partition!
 val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
 val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
 

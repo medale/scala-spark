@@ -26,7 +26,7 @@ object HelloSparkWorld {
     """Live as if you were to die tomorrow
       |Learn as if you were to live forever""".stripMargin
 
-  val StopWords = List("be","to")
+  val StopWords = List("be", "to")
 
   def readLinesFromString(input: String): Seq[String] = {
     val lines = input.split("\n")
@@ -45,19 +45,28 @@ object HelloSparkWorld {
     def toLower(s: String): String = {
       s.toLowerCase
     }
+
     //explicitly call function
     val lowerLines = lines.map(toLower)
 
     val words = lowerLines.flatMap { line =>
-      line.split("""\s+""")}
+      line.split("""\s+""")
+    }
 
     val noStopWords = words.filter(!StopWords.contains(_))
 
-    val wordsMap: Map[String,Seq[String]] =
-      noStopWords.groupBy( w => identity(w))
-    //wordsMap.mapValues(vs => vs.size)
-    val wordCountsMap = wordsMap.mapValues(_.size)
-    val countsString = wordCountsMap.mkString("\n","\n","\n")
+    val emptyMapWithZeroDefault =
+      Map[String, Int]().withDefaultValue(0)
+
+    //foldLeft(z: B)((B,A) => B): B
+    val wordCountsMap: Map[String, Int] =
+      noStopWords.foldLeft(emptyMapWithZeroDefault)(
+        (wcMap, word) => {
+          val newCount = wcMap(word) + 1
+          wcMap + (word -> newCount)
+        })
+
+    val countsString = wordCountsMap.mkString("\n", "\n", "\n")
     println(s"The word counts were: ${countsString}")
   }
 
@@ -73,12 +82,14 @@ object HelloSparkWorld {
 
     //Don't use groupBy - very expensive to shuffle words across partition!
 
-    val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
+    val wordCountTuplesRdd = noStopWordsRdd.map {
+      (_, 1)
+    }
     val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
 
     val localWordCounts = wordCountsRdd.collect()
 
-    println(s"The word counts were: ${localWordCounts.mkString("\n","\n","\n")}")
+    println(s"The word counts were: ${localWordCounts.mkString("\n", "\n", "\n")}")
   }
 
   /**

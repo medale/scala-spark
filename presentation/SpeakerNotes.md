@@ -63,6 +63,7 @@
      * apply method - constructor without new
      * also unapply for pattern matching
 * Scala: Lots of "syntactic sugar" - less typing, compiler translates
+     * access elements in indexed collection: coll(index) - coll.apply(index)
 
 # Scala Main One - Output
 * toString method created, prints class name, instance variables
@@ -78,7 +79,8 @@
 * static apply factory method/unapply for matching
    * two fields etc.: `public static Option<Tuple2<Object, Object>> unapply(Foo)`
 * copy method
-* equals, hashCode, toString (see javap output next)
+   * Scala - named parameters (can create new object with one changed param)
+* equals, hashCode, toString
 
 # HelloSparkWorld - expression-oriented 
 * expressions returns value (vs. statements)
@@ -142,6 +144,7 @@
 * map - iterate over seq, one input, one output element
      * Immutability: underlying seq is not updated, returns new seq!
 * map - with named function 
+   * can define function within a function (also imports)
    * if small function - pollute namespace, harder to read
    
 # wordCountLocal: map higher-order function w/ function literal
@@ -149,16 +152,32 @@
 * placeholder syntax - if parameter is only used once
      * for two param function, first _, second _
  
- # wordCountLocal: flatMap and filter
+# map function
+* new collection
+* same number of elements
+* use function to transform each element (doesn't have to be same type)
+
+# flatMap function
+* map + flatten - map function must return collection (GenTraversableOnce)
+* flatten - takes each element of result collection and appends to output in order
+     * only flattens outermost collection!
+     
+# wordCountLocal: flatMap and filter
 * flatMap - one input element - GenTraversableOnce (Seq-like), 0 or more
 * filter - keep elements that test true
 
 # Scala Seq trait API
 * Show filter, flatMap higher-order functions
 
-# wordCountLocal: groupBy, mkString
-* groupBy - create map with word, list of all occurrences of word (could group by same starting letter...)
-* mapValues(syntactic sugar - _ argument one)
+# wordCountLocal: foldLeft
+* create empty map String to Int, default value 0
+* two args: 1 arg - same as return type (here map)
+* second arg: function of (map, current word)
+     * look up value for word and increment by 1 (default 0)
+     * if not default - NoSuchElementException
+     * create new map with updated key - newValue pair (replace existing key)
+
+# wordCountLocal: mkString
 * mkString
 * string interpolation - s"..."
 
