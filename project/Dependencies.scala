@@ -29,5 +29,8 @@ object Dependencies {
     ("org.scalatest" %% "scalatest" % "3.0.5" % "it,test")
   )
 
-  val sparkTestDependencies = Seq(("com.holdenkarau" %% "spark-testing-base" % "2.3.1_0.10.0" % "it,test"))
+  val sparkTestDependencies = Seq(
+    ("com.holdenkarau" %% "spark-testing-base" % "2.3.1_0.10.0" % "it,test"),
+    ("org.apache.spark" %% "spark-hive" % sparkVersion % "it,test")
+  )
 }

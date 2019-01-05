@@ -8,45 +8,75 @@ case class Person(firstName: String,
                   lastName: String,
                   age: Int)
 
+class FullName(firstName: String, lastName: String)
+
 /**
   * Object entry point - runnable main method (don't use class!)
   */
 object HelloSparkDatasetWorld {
 
-  def processPerson(spark: SparkSession): Unit = {
+  def createPersonDataset(spark: SparkSession,
+                          persons: Seq[Person]): Dataset[Person] = {
+    //createDataset[T : Encoder](data: Seq[T]): Dataset[T]
+    //implicit def newSequenceEncoder[T <: Seq[_] : TypeTag]: Encoder[T]
 
-    val persons = List(Person("John","Doe",42),
-      Person("Jane","Doe",43))
+    //Or - via SQLImplicits
+    //localSeqToDatasetHolder - DatasetHolder.toDS()
+    //val people: Dataset[Person] = persons.toDS()
 
-    println(persons(0).isInstanceOf[Product])
-    println(persons(0).isInstanceOf[Serializable])
-
-    val people: Dataset[Row] = spark.createDataFrame(persons)
-
-    people.printSchema()
-
-    val uniqueLastNames: Dataset[Row] = people.select("lastName").distinct()
-
-    uniqueLastNames.printSchema()
-
-    val uniqueNamesLocal: Array[Row] = uniqueLastNames.collect()
-
-    val uniqueNames = uniqueNamesLocal.map(r => r.getString(0))
-    println(s"The unique last names were: ${uniqueNames.mkString(",")}")
-  }
-
-  def processString(spark: SparkSession): Unit = {
-    val names = List("John Doe", "Jane Doe")
+    //If not a Scala primitive or case class error:
+    // Error: Unable to find encoder for type FullName.
+    // An implicit Encoder[FullName] is needed to store FullName instances in a Dataset.
+    // Primitive types (Int, String, etc) and Product types (case classes) are supported
+    // by importing spark.implicits._  Support for serializing other types will be added
+    // in future releases.
+    //val names = List(new FullName("J","Doe"))
+    //val ns = spark.createDataset(names)
 
     import spark.implicits._
-    val people: Dataset[String] = spark.createDataset(names)
+    spark.createDataset(persons)
+  }
 
-    val firsts = people.map { fullName =>
+  def countAgeLessThanCutoff(spark: SparkSession,
+                             people: Dataset[Person],
+                             ageCutoff: Int = 42): Long = {
+
+    //for $
+    import spark.implicits._
+
+    //using: def where(condition: Column)
+    //also: def where(conditionExpr: String)
+    val youngers: Dataset[Row] = people.
+      where($"age" < ageCutoff).
+      select("firstName")
+
+    //people.where($"age".>(olderCutoff))
+
+    //column equality is === - the == is Scala equals
+    //people.where($"firstName" === "Jane")
+
+    youngers.count()
+  }
+
+  def createDatasetFromStrings(spark: SparkSession, inputs: Seq[String]): Dataset[String] = {
+    import spark.implicits._
+    spark.createDataset(inputs)
+  }
+
+  def processNames(spark: SparkSession,
+                   namesDs: Dataset[String]): Long = {
+
+    //need implicit Encoder for map
+    import spark.implicits._
+    val firsts = namesDs.map { fullName =>
       val firstLast = fullName.split(" ")
       firstLast(0)
     }
 
+    println("\nAll first names:")
     firsts.show()
+
+    firsts.count()
   }
 
   /**
@@ -61,8 +91,15 @@ object HelloSparkDatasetWorld {
       master("local[2]").
       getOrCreate()
 
-    processPerson(spark)
-    processString(spark)
+    //Person.apply("John...
+    val persons = List(Person("John", "Doe", 42),
+      Person("Jane", "Doe", 43))
+    val people = createPersonDataset(spark, persons)
+    countAgeLessThanCutoff(spark, people)
+
+    val fullNames = List("John Doe", "Jane Doe")
+    val namesDs = createDatasetFromStrings(spark, fullNames)
+    processNames(spark, namesDs)
 
     spark.close()
   }

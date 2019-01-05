@@ -59,72 +59,10 @@ object ScalaMainOne {
   def main(args: Array[String]): Unit = {
     println("Starting a Scala program...")
     val scMain = new ScalaMainOne(42)
-    println(scMain)
     val answer = scMain.answer
     println(s"The answer was ${answer}")
   }
 }
-```
-\normalsize
-
-# Scala Main One - Output
-
-```bash
-Starting a Scala program...
-com.uebercomputing.scalaspark.common.ScalaMainOne@256216b3
-The answer was 42
-```
-
-# Scala Main Two - case class
-
-\small
-```scala
-package com.uebercomputing.scalaspark.common
-
-case class ScalaMainTwo(answer: Int)
-
-object ScalaMainTwo {
-
-  def main(args: Array[String]): Unit = {
-    println("Starting a Scala program...")
-    //ScalaMainTwo.apply(42)
-    val scMain = ScalaMainTwo(42)
-    println(scMain)
-    val answer = scMain.answer
-    println(s"The answer was ${answer}")
-  }
-
-}
-```
-\normalsize
-
-
-# Scala Main Two - Output
-
-```bash
-Starting a Scala program...
-ScalaMainTwo(42)
-The answer was 42
-```
-
-# Scala Main Two - javap ScalaMainTwo.class
-
-\small
-```java
-public class ScalaMainTwo implements Product,Serializable
-  public static Option<Object> unapply(ScalaMainTwo);
-  public static ScalaMainTwo apply(int);
-...
-  public ScalaMainTwo copy(int);
-...
-  public int productArity();
-  public Object productElement(int);
-  public Iterator<Object> productIterator();
-...
-  public int hashCode();
-  public String toString();
-  public boolean equals(Object);
-...
 ```
 \normalsize
 
@@ -333,17 +271,60 @@ val localWordCounts = wordCountsRdd.collect()
 
 ![RDD object API](graphics/SparkRddObjectApi.png)
 
-
-# HelloSparkDatasetWorld - case class (Product/Serializable)
+# HelloSparkDatasetWorld - Scala case class
 
 ```scala
-case class Person(firstName: String, 
-                  lastName: String, 
+case class Person(firstName: String,
+                  lastName: String,
                   age: Int)
+```
 
+# HelloSparkDatasetWorld - javap Person.class
+
+\small
+```java
+public class Person implements Product,Serializable {
+  public static Option<Tuple3<String,String,Object>> unapply(Person);
+  public static Person apply(String, String, int);
+...
+  public String firstName();
+  public String lastName();
+  public int age();
+...  
+  public Person copy(String, String, int);
+...
+  public String productPrefix();
+  public int productArity();
+  public Object productElement(int);
+  public Iterator<Object> productIterator();
+...
+  public int hashCode();
+  public String toString();
+  public boolean equals(Object);
+  public Person(String, String, int);
+}
+
+```
+\normalsize
+
+# HelloSparkDatasetWorld - Encoder
+
+```scala
+//Person.apply("John...
 val persons = List(Person("John","Doe",42),
       Person("Jane","Doe",43))
 
-// createDataFrame[A <: Product](data: Seq[A]): DataFrame
-val people: Dataset[Row] = spark.createDataFrame(persons)
+//createDataset[T : Encoder](data: Seq[T]): Dataset[T]
+import spark.implicits._
+val people: Dataset[Person] = spark.createDataset(persons)
+
+val olderCutoff = 42
+//ageCol.>(olderCutoff)
+val olderFirstNames: Dataset[Row] = people.
+      where($"age" > olderCutoff).
+      select("firstName")
 ```
+
+# Column-based: org.apache.spark.sql.functions._
+
+![Spark SQL functions](graphics/SparkFunctionsApi.png)

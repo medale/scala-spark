@@ -28,6 +28,7 @@ object ImplicitExplorer {
   //implicit value
   implicit val z = "zbar"
 
+  //if we defined zz below:
   //Error: two implicit values of same type
   //when compile:
   //Error:(46, 19) ambiguous implicit values:
@@ -42,6 +43,7 @@ object ImplicitExplorer {
     new StringFoo(s)
   }
 
+  //if we defined stringToStringFooToo
   //Error: two possible conversions to .foo
   //when compile:
   //Error:(28, 13) type mismatch;

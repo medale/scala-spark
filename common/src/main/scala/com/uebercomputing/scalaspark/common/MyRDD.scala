@@ -1,11 +1,13 @@
 package com.uebercomputing.scalaspark.common
 
+import scala.language.implicitConversions
+
 /**
   *
   */
 class MyRDD[T](v: T) {
 
-  def map[T,U](func: T => U): MyRDD[U] = {
+  def map[U](func: T => U): MyRDD[U] = {
     new MyRDD(func(v))
   }
 }

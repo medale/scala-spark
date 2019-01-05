@@ -52,36 +52,6 @@
      * Java get/set: `import scala.reflect.BeanProperty`
      * `@BeanProperty var firstName`
 
-# Scala Main One - Output
-* println statements
-* default class to String - fully qualified class name@...
-
-# Scala Main Two - case class
-* immutable data structure
-* default constructor parameters are `val`
-* generates boiler plate code, singleton object
-     * apply method - constructor without new
-     * also unapply for pattern matching
-* Scala: Lots of "syntactic sugar" - less typing, compiler translates
-     * access elements in indexed collection: coll(index) - coll.apply(index)
-
-# Scala Main One - Output
-* toString method created, prints class name, instance variables
-
-# Scala Main Two - javap ScalaMainTwo.class
-* javap disassembler (package names removed)
-* implements Product (abstract algebraic type), Serializable
-     * Serializable important for Spark shuffle!
-     * Product
-          * productArity
-          * productElement(int) 
-          * productIterator
-* static apply factory method/unapply for matching
-   * two fields etc.: `public static Option<Tuple2<Object, Object>> unapply(Foo)`
-* copy method
-   * Scala - named parameters (can create new object with one changed param)
-* equals, hashCode, toString
-
 # HelloSparkWorld - expression-oriented 
 * expressions returns value (vs. statements)
      * Array (any indexed sequence) accessor args(index)
@@ -190,6 +160,7 @@
 # HelloSparkWorld - RDD of tuples - PairRDDFunctions
 * groupBy - expensive shuffle operation
 * map to 2 tuple - implicit conversion to PairRDDFunctions
+     * import org.a.s.rdd.RDD 
      * object RDD - `implicit def rddToPairRDDFunctions(rdd: RDD[(K, V)])`
 * PairRDDFunctions - reduceByKey - function with two arguments
      * local combine step, then shuffle (hashPartitioner)
@@ -201,10 +172,46 @@
      * (K,V) pairs - rddToPairRDDFunctions
      * Double/Numeric - double/numericRDDToDoubleRDDFunctions
 
-# HelloSparkDatasetWorld - case class (Product/Serializable)
-* case class extends Product with Serializable
+# HelloSparkDatasetWorld - Scala case class
+* immutable data structure
+* default constructor parameters are `val`
+* generates boiler plate code, singleton object
+     * apply method - constructor without new
+     * also unapply for pattern matching
+* Scala: Lots of "syntactic sugar" - less typing, compiler translates
+     * access elements in indexed collection: coll(index) - coll.apply(index)
 
+# HelloSparkDatasetWorld - javap Person.class
+* javap disassembler (package names removed)
+* implements Product (abstract algebraic type), Serializable
+     * Serializable important for Spark shuffle!
+     * Product (productPrefix = classname)
+          * productArity
+          * productElement(int) 
+          * productIterator
+* static apply factory method/unapply for matching
+* copy method
+   * Scala - named parameters (can create new object with one changed param)
+   * `p.copy(age=43)`
+* equals, hashCode, toString
+   * toString - classname(field1,field2...)
+* also curried, tupled methods
 
+# HelloSparkDatasetWorld - Encoder
+* Encoder: Spark manages objects in memory (minimize garbage collection)
+     * import implicits for Encoders for Scala primitives, String, Product..
+* select returns DataFrame (a Dataset\[Row\])
+* where with Column - $ convert string to Column
+     * greater method on Column
+     * === for column equality (== for Scala equality!!)
+
+# org.apache.spark.sql.functions._
+* Column-based manipulation of column content 
+     * time
+     * string
+     * math
+* aggregate functions with RelationalGroupedDataset.agg (after groupBy)
+ 
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin
 * object/main method
