@@ -27,7 +27,7 @@
 * less boilerplate/less typing (Ted Malaska (three big data books on O'Reilly): 50% less than Java)
 * strong typing, elegant multi-paradigm language (functional and OO)
 * all code runs in executor JVM - no callouts to local Python shell for UDFs/UDAFs
-* spark-shell is Scala-based
+* *spark-shell* is Scala-based
 * Baltimore Scala meetup
 
 # Java to Scala - Java Main
@@ -195,6 +195,14 @@
      * local combine step, then shuffle (hashPartitioner)
 * transformations (lazy) executed by action collect()!
      * to local driver - memory!!!
+
+# RDD object API
+* implicit conversions of RDD of type x - to, for example:
+     * (K,V) pairs - rddToPairRDDFunctions
+     * Double/Numeric - double/numericRDDToDoubleRDDFunctions
+
+# HelloSparkDatasetWorld - case class (Product/Serializable)
+* case class extends Product with Serializable
 
 
 # Want to cover - highlights but have in-depth examples in repo

@@ -4,16 +4,17 @@ import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.SparkSession
 
-case class Person(firstName: String, lastName: String, age: Int)
+case class Person(firstName: String,
+                  lastName: String,
+                  age: Int)
 
 /**
   * Object entry point - runnable main method (don't use class!)
   */
 object HelloSparkDatasetWorld {
 
-  def process(spark: SparkSession): Unit = {
+  def processPerson(spark: SparkSession): Unit = {
 
-    //persons: List[Person]
     val persons = List(Person("John","Doe",42),
       Person("Jane","Doe",43))
 
@@ -22,11 +23,30 @@ object HelloSparkDatasetWorld {
 
     val people: Dataset[Row] = spark.createDataFrame(persons)
 
+    people.printSchema()
+
     val uniqueLastNames: Dataset[Row] = people.select("lastName").distinct()
+
+    uniqueLastNames.printSchema()
 
     val uniqueNamesLocal: Array[Row] = uniqueLastNames.collect()
 
-    println(s"The unique last names were: ${uniqueNamesLocal.mkString(",")}")
+    val uniqueNames = uniqueNamesLocal.map(r => r.getString(0))
+    println(s"The unique last names were: ${uniqueNames.mkString(",")}")
+  }
+
+  def processString(spark: SparkSession): Unit = {
+    val names = List("John Doe", "Jane Doe")
+
+    import spark.implicits._
+    val people: Dataset[String] = spark.createDataset(names)
+
+    val firsts = people.map { fullName =>
+      val firstLast = fullName.split(" ")
+      firstLast(0)
+    }
+
+    firsts.show()
   }
 
   /**
@@ -40,6 +60,10 @@ object HelloSparkDatasetWorld {
       appName("HelloSparkDatasetWorld").
       master("local[2]").
       getOrCreate()
-    process(spark)
+
+    processPerson(spark)
+    processString(spark)
+
+    spark.close()
   }
 }

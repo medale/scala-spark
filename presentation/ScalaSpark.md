@@ -320,10 +320,30 @@ val noStopWordsRdd = wordsRdd.filter(!StopWords.contains(_))
 # HelloSparkWorld - RDD of tuples - PairRDDFunctions
 
 ```scala
- //Don't use groupBy - expensive to shuffle words across partition!
+ //groupBy - expensive to shuffle words across partition!
 val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
+
 val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
 
 //and Action!
 val localWordCounts = wordCountsRdd.collect()
+```
+
+# RDD object API
+
+![RDD object API](graphics/SparkRddObjectApi.png)
+
+
+# HelloSparkDatasetWorld - case class (Product/Serializable)
+
+```scala
+case class Person(firstName: String, 
+                  lastName: String, 
+                  age: Int)
+
+val persons = List(Person("John","Doe",42),
+      Person("Jane","Doe",43))
+
+// createDataFrame[A <: Product](data: Seq[A]): DataFrame
+val people: Dataset[Row] = spark.createDataFrame(persons)
 ```
