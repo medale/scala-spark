@@ -50,7 +50,7 @@ object HelloSparkDatasetWorld {
       where($"age" < ageCutoff).
       select("firstName")
 
-    //people.where($"age".>(olderCutoff))
+    //people.where($"age".<(ageCutoff))
 
     //column equality is === - the == is Scala equals
     //people.where($"firstName" === "Jane")

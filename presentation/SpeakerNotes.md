@@ -164,7 +164,7 @@
      * object RDD - `implicit def rddToPairRDDFunctions(rdd: RDD[(K, V)])`
 * PairRDDFunctions - reduceByKey - function with two arguments
      * local combine step, then shuffle (hashPartitioner)
-* transformations (lazy) executed by action collect()!
+* *transformations (lazy)* executed by *action* collect()!
      * to local driver - memory!!!
 
 # RDD object API
@@ -202,8 +202,8 @@
      * import implicits for Encoders for Scala primitives, String, Product..
 * select returns DataFrame (a Dataset\[Row\])
 * where with Column - $ convert string to Column
-     * greater method on Column
-     * === for column equality (== for Scala equality!!)
+     * less than method on Column
+     * === for column equality (== for Scala equality (object and primitives)!!)
 
 # org.apache.spark.sql.functions._
 * Column-based manipulation of column content 
@@ -212,6 +212,35 @@
      * math
 * aggregate functions with RelationalGroupedDataset.agg (after groupBy)
  
+# Integration Testing - make code testable as you write
+* Tests basic logic (not scalability - partitioning, OOM errors, key skew)
+* Separate out dataset creation (from file, directory etc.)
+* Method returns testable value (or write to local file dir, test)
+
+# Integration Testing - ScalaTest with Spark Testing Base
+* ScalaTest - FunSuite (xTest), FunSpec more BDD specs
+* Spark Testing Base - trait DatasetSuiteBase
+     * `spark` SparkSession
+     * Dataset equality, approximate equality...
+* Test boundaries etc.
+
+# Integration Testing - assertExpectedCountForCutoff
+* Use DatasetSuiteBase spark
+* refactor common testing 
+* Matchers - should equal 
+
+# sbt - "build tool for Scala, Java and more"
+* 
+
+# Resources
+* Dean Wampler, Lightbend - great Scala learning/reference
+     * Safari Books online - ACM
+* Jacek Laskowski - updated content through Spark 2.4 (latest version)
+* Bill Venners/Artima - ScalaTest
+* Holden Karau - Spark Testing Base, speaker, Spark maintainer/PMC, now at Google
+* sbt reference manual
+
+
 # Want to cover - highlights but have in-depth examples in repo
 * Intellij Scala plugin
 * object/main method
