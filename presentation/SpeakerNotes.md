@@ -269,7 +269,8 @@
 * publish, publishLocal (also publishTo, Mavenstyle)
 
 # And now for something completely different: Colon Cancer
-* 
+* Screening saves lives!
+* Dave Barry Colonoscopy
 
 # Resources
 * Dean Wampler, Lightbend - great Scala learning/reference
@@ -279,5 +280,9 @@
 * Holden Karau - Spark Testing Base, speaker, Spark maintainer/PMC, now at Google
 * sbt reference manual
 
-
+# Questions?
+* email
+* blog
+* repo
+* table tennis
 

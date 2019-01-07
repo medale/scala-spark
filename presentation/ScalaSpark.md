@@ -314,7 +314,7 @@ public class Person implements Product,Serializable {
 ```
 \normalsize
 
-# HelloSparkDatasetWorld - Encoder,Column
+# HelloSparkDatasetWorld - Encoder, Column
 
 ```scala
 //Person.apply("John...
@@ -342,7 +342,7 @@ youngers.count
 ```scala
 //load initial dataset (file, directory...)
 def createPersonDataset(spark: SparkSession,
-                        persons: Seq[Person]): Dataset[Person]
+            persons: Seq[Person]): Dataset[Person]
 
 def countAgeLessThanCutoff(spark: SparkSession,
                            people: Dataset[Person],
@@ -463,6 +463,7 @@ sbt:root> common/run
 sbt:root> assembly
 sbt:root> publish
 ```
+
 # And now for something completely different: Colon Cancer
 * Screening saves lives! ![](graphics/Chemo.png){width=100px}
      * Colonoscopy - talk to your doc
