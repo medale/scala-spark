@@ -230,6 +230,38 @@
 * Matchers - should equal 
 
 # sbt - "build tool for Scala, Java and more"
+* Scala, Java and mixed, C++
+* build.sbt - modules/libraries used
+* version.sbt - project version
+* project/build.properties - sbt version to use
+     * plugins.sbt - e.g. assembly
+     * Dependencies.scala
+* subproject standard directory layout
+
+# sbt - Dependencies.scala
+* Libraries and version
+* % vs. %% (spark-core_2.11)
+
+# sbt - build.sbt
+* analytics and common subprojects
+* Scope: ThisBuild common settings for subprojects
+* assemblyPluginSettings - fat jar file (assembly)
+* dependsOn - other subproject
+* Integration test settings - it:test
+* subproject name for published artifacts
+* library dependencies from Dependencies.scala
+
+# sbt tasks
+* start interactive sbt shell
+* compile, test (root project)
+* it:test in analytics subproject
+* console - with dependencies
+* run - finds all Main classes (can invoke with args)
+* assembly - fat jar
+     * under target/scala-2.11
+* publish, publishLocal (also publishTo, Mavenstyle)
+
+# And now for something completely different: Colon Cancer
 * 
 
 # Resources
@@ -241,18 +273,4 @@
 * sbt reference manual
 
 
-# Want to cover - highlights but have in-depth examples in repo
-* Intellij Scala plugin
-* object/main method
-* case class - Product
-* functions - defining a function, anonymous functions
-* collections - map, flatMap, filter
-* immutability
-* implicits - Predef / StringOps / StringLike
-* Scala docs
-* Spark - RDD, Dataframe, Dataset (Tungsten memory, code gen)
-* SparkSession, DataframeReader
-* udf
-* sbt build - quick overview
-* integration testing - spark-testing-base
 

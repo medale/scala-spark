@@ -80,7 +80,7 @@ lazy val common = (project in file("common"))
         testDependencies
   )
 
-lazy val analytics = (project in file("analytics"))
+lazy val analytics = project
   .dependsOn(common)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)

@@ -379,6 +379,88 @@ def assertExpectedCountForCutoff(ageCutoff: Int,
 
 # sbt - "build tool for Scala, Java and more"
 
+\small
+```
+- build.sbt
+- version.sbt
+- project/
+   - build.properties
+   - plugins.sbt
+   - Dependencies.scala
+- common
+   - src
+      - it/resources
+      - it/scala
+      - main
+      - test
+   - target
+      - scala-2.11/analytics-0.9.0-SNAPSHOT-fat.jar
+      - scala-2.11/classes
+```
+\normalsize
+
+# sbt - Dependencies.scala
+
+\small
+
+```scala
+import sbt._
+
+object Dependencies {
+  //match Spark's pom for dependencies!
+  val sparkVersion = "2.4.0"
+
+  lazy val commonDependencies = Seq(
+     ("commons-io" % "commons-io" % "2.4")
+  )
+
+  lazy val sparkDependencies = Seq(
+    ("org.apache.spark" %% "spark-core" % sparkVersion)
+    ...
+```
+\normalsize
+
+# sbt - build.sbt
+
+\small
+```scala
+ThisBuild / scalaVersion := "2.11.8"
+...
+lazy val analytics = project
+  .dependsOn(common)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
+  .settings(
+    name := s"${namePrefix}-analytics",
+    libraryDependencies :=
+      commonDependencies ++
+        sparkDependencies ++
+        testDependencies ++
+        sparkTestDependencies
+  )
+lazy val root = (project in file("."))
+  .aggregate(common, analytics) 
+... 
+```
+\normalsize
+
+# sbt tasks
+
+```bash
+sbt
+sbt:root> compile
+sbt:root> test
+sbt:root> analytics/it:test
+sbt:root> common/console
+sbt:root> common/run
+sbt:root> assembly
+sbt:root> publish
+```
+# And now for something completely different: Colon Cancer
+* Screening saves lives! ![](graphics/Chemo.png){width=100px}
+     * Colonoscopy - talk to your doc
+     * [Dave Barry: A journey into my colon — and yours](https://www.miamiherald.com/living/liv-columns-blogs/dave-barry/article1928847.html)
+* [Colorectal Cancer Alliance](https://www.ccalliance.org/)
 
 # Resources
 
@@ -387,3 +469,11 @@ def assertExpectedCountForCutoff(ageCutoff: Int,
 * [ScalaTest](http://www.scalatest.org/)
 * [Holden Karau Spark Testing Base](https://github.com/holdenk/spark-testing-base)
 * [sbt reference manual](https://www.scala-sbt.org/1.x/docs/index.html)
+
+# Questions?
+
+![](graphics/Farley.png){width=100px}\ ![](graphics/AsymmetrikPingPong.png){width=100px}
+
+* medale@asymmetrik.com
+* [Infrequent blog/past presentations http://uebercomputing.com/](http://uebercomputing.com/)
+* [Scala Spark repo: https://github.com/medale/scala-spark](https://github.com/medale/scala-spark)
