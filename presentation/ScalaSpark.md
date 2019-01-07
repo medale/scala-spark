@@ -18,6 +18,8 @@ date: Jan 2019
 ![Intro to Scala for Spark](graphics/Goal.png)
 
 # Why Scala for Spark?
+![](graphics/SparkShell.png){width=200px}
+
 * full interoperability with Java
      * strong type system
      * elegant multi-paradigm (functional & OO)
@@ -79,41 +81,15 @@ object HelloSparkWorld {
     } else {
       readLinesFromString(GhandiQuote)
     }
-    ...
+    
+    wordCountLocal(lines)
+      ...
 }
 ```
 
 # Scala Type Hierarchy
 
 ![Scala Type Hierarchy](graphics/ScalaTypeHierarchy.png)
-
-
-# HelloSparkWorld - SparkSession
-
-\small
-```scala
-import org.apache.spark.sql.SparkSession
-...
-def main(args: Array[String]): Unit = {
-   val lines = ...
-
-   wordCountLocal(lines)
-
-   val spark = SparkSession.builder.
-      appName("HelloSparkWorld").
-      master("local[2]").
-      getOrCreate()
-
-   wordCountRdd(spark, lines)
-
-   spark.close()
-}
-```
-\normalsize
-
-# SparkSession Scala API
-
-![SparkSession class](graphics/SparkSessionApi.png)
 
 # HelloSparkWorld - String, StringOps, implicits
 
@@ -234,8 +210,39 @@ val wordCountsMap: Map[String, Int] =
 ```scala
 val countsString = wordCountsMap.mkString("\n", "\n", "\n")
 println(s"The word counts were: ${countsString}")
+
+The word counts were: 
+learn -> 1
+if -> 2
+as -> 2
+you -> 2
+die -> 1
+...
 ```
 \normalsize
+
+# HelloSparkWorld - SparkSession
+
+```scala
+import org.apache.spark.sql.SparkSession
+...
+def main(args: Array[String]): Unit = {
+   val lines = ...
+
+   val spark = SparkSession.builder.
+      appName("HelloSparkWorld").
+      master("local[2]").
+      getOrCreate()
+
+   wordCountRdd(spark, lines)
+
+   spark.close()
+}
+```
+
+# SparkSession Scala API
+
+![SparkSession class](graphics/SparkSessionApi.png)
 
 # HelloSparkWorld - RDD map, flatMap, filter
 
@@ -258,9 +265,9 @@ val noStopWordsRdd = wordsRdd.filter(!StopWords.contains(_))
 # HelloSparkWorld - RDD of tuples - PairRDDFunctions
 
 ```scala
- //groupBy - expensive to shuffle words across partition!
 val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
 
+//No groupBy - expensive to shuffle words!
 val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
 
 //and Action!

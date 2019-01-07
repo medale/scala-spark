@@ -28,6 +28,7 @@
 * strong typing, elegant multi-paradigm language (functional and OO)
 * all code runs in executor JVM - no callouts to local Python shell for UDFs/UDAFs
 * *spark-shell* is Scala-based
+* immutability for parallel/distributed computing
 * Baltimore Scala meetup
 
 # Java to Scala - Java Main
@@ -57,6 +58,10 @@
      * Array (any indexed sequence) accessor args(index)
      * type of lines is inferred as lowest-common denominator if/else block
      * In this case: `Seq[String]`
+* can declare type (instead of infer) for troubleshooting
+* Word count - hello world for big data
+     * do with Scala
+     * do with Spark RDD
 
 # Scala Type Hierarchy
 * Main division - AnyVal vs. AnyRef (unified through Any)
@@ -70,22 +75,10 @@
      * only has defs as members
 * Nothing is subclass of everything (throwing exception returns Nothing)
 
-# HelloSparkWorld - SparkSession
-* object - main method entry point
-* [SparkSession Scala API](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession)
-     * scaladocs
-     * object
-     * class
-     * .builder method (don't need empty parentheses - mutator method with ())
-* Builder class - fluent interface/method chaining
-     * getOrCreate
-     * Run from shell or batch spark-submit
-
-# SparkSession Scala API
-* Showed SparkSession scaladocs
-
 # HelloSparkWorld - String, StringOps, implicits
-* Triple quoted string can include special chars like newline, double-quote
+* Triple quoted string can include special chars like 
+     * newline
+     * double-quote (great for JSON!)
 * .stripMargin - by default uses pipe | removes all chars in front of pipe
 * String - where does stripMargin method come from? (next slide)
 
@@ -150,6 +143,20 @@
 # wordCountLocal: mkString
 * mkString
 * string interpolation - s"..."
+
+# HelloSparkWorld - SparkSession
+* object - main method entry point
+* [SparkSession Scala API](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession)
+     * scaladocs
+     * object
+     * class
+     * .builder method (don't need empty parentheses - mutator method with ())
+* Builder class - fluent interface/method chaining
+     * getOrCreate
+     * Run from shell or batch spark-submit
+
+# SparkSession Scala API
+* Showed SparkSession scaladocs
 
 # HelloSparkWorld - RDD map, flatMap, filter
 * process at scale!
