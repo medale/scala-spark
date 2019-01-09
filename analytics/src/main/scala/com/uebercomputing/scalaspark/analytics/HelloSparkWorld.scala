@@ -101,7 +101,7 @@ object HelloSparkWorld {
     */
   def main(args: Array[String]): Unit = {
 
-    val lines = if (!args.isEmpty) {
+    val lines = if (args.nonEmpty) {
       val inputFile = args(0)
       readLinesFromFile(inputFile)
     } else {

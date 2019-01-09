@@ -75,7 +75,7 @@ object HelloSparkWorld {
 ...
   def main(args: Array[String]): Unit = {
 
-    val lines = if (!args.isEmpty) {
+    val lines = if (args.nonEmpty) {
       val inputFile = args(0)
       readLinesFromFile(inputFile)
     } else {
@@ -268,6 +268,8 @@ val noStopWordsRdd = wordsRdd.filter(!StopWords.contains(_))
 val wordCountTuplesRdd = noStopWordsRdd.map { (_, 1) }
 
 //No groupBy - expensive to shuffle words!
+//PairRDDFunctions
+//def reduceByKey(func: (V, V) => V): RDD[(K, V)]
 val wordCountsRdd = wordCountTuplesRdd.reduceByKey(_ + _)
 
 //and Action!
@@ -355,10 +357,10 @@ def countAgeLessThanCutoff(spark: SparkSession,
 ```scala
 class HelloSparkDatasetWorldIntegrationTest extends 
   FunSpec with Matchers with DatasetSuiteBase {
-...
+    ...
+  //42,43,2
+  val MyPersons = List(johnD, janeD, babyD)
   describe("countAgeLessThanCutoff") {
-    def assertExpectedCountForCutoff(ageCutoff: Int,
-                     expectedCount: Int): Assertion...
     it("should return count = all for high cutoff") {
       val ageCutoff = 99
       val expectedCount = MyPersons.size
