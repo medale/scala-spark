@@ -158,13 +158,13 @@ def wordCountLocal(lines: Seq[String]): Unit = {
 
 ```scala
 //function literal - anonymous function explicit type: 
-lines.map((l: String) => l.toLowerCase)
+val lowerLines = lines.map((l: String) => l.toLowerCase)
 
 //function literal - anonymous with inferred type:
-lines.map(l => l.toLowerCase)
+val lowerLines = lines.map(l => l.toLowerCase)
 
 //function literal with placeholder syntax
-lines.map(_.toLowerCase)
+val lowerLines = lines.map(_.toLowerCase)
 ```
 
 # map function
@@ -327,7 +327,7 @@ val persons = List(Person("John","Doe",42),
 import spark.implicits._
 val people: Dataset[Person] = spark.createDataset(persons)
 
-//people.where(people("age").>(olderCutoff))
+//people.where(people("age").<(ageCutoff))
 val youngers: Dataset[Row] = people.
    where($"age" < ageCutoff).
    select("firstName")
